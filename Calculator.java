@@ -102,7 +102,7 @@ class Calculator{
                     System.out.println("Please enter x and y: ");
                     x = cal.nextDouble();
                     y = cal.nextDouble();
-                    res = x + y;
+                    res = CalculatorLogic.add(x, y);
                     break;
 
                 case "-":
@@ -110,7 +110,7 @@ class Calculator{
                     System.out.println("Please enter x and y: ");
                     x = cal.nextDouble();
                     y = cal.nextDouble();
-                    res = x - y;
+                    res = CalculatorLogic.subtract(x, y);
                     break;
 
                 case "*":
@@ -118,7 +118,7 @@ class Calculator{
                     System.out.println("Please enter x and y: ");
                     x = cal.nextDouble();
                     y = cal.nextDouble();
-                    res = x * y;
+                    res = CalculatorLogic.multiply(x, y);
                     break;
 
                 case "/":
@@ -126,14 +126,7 @@ class Calculator{
                     System.out.println("Please enter x and y: ");
                     x = cal.nextDouble();
                     y = cal.nextDouble();
-
-                    //is y = 0?
-                    if(y == 0){
-                        System.out.println("Oops! Division by zero is not allowed.");
-                        validOp = false;
-                    }
-                    else
-                        res = x / y;
+                    res = CalculatorLogic.divide(x, y);
                     break;
 
                 case "mod":
@@ -141,14 +134,7 @@ class Calculator{
                     System.out.println("Please enter x and y: ");
                     x = cal.nextDouble();
                     y = cal.nextDouble();
-
-                    //is y = 0?
-                    if(y == 0){
-                        System.out.println("Oops! Modulus by zero is not allowed.");
-                        validOp = false;
-                    }
-                    else
-                        res = x % y;
+                    res = CalculatorLogic.mod(x, y);
                     break;
 
                 case "!":
@@ -156,16 +142,7 @@ class Calculator{
                     System.out.print("Please enter x: ");
                     int n = cal.nextInt();
 
-                    //is x = -ve?
-                    if(n < 0){
-                        System.out.println("Oops! Factorial is not defined for negatives.");
-                        validOp = false;
-                    }
-                    else{
-                        res = 1;
-                        for(int i = 2;i <= n;i++)
-                            res *= i;
-                    }
+                    res = CalculatorLogic.factorial(n);
                     
                     break;
 
@@ -173,21 +150,14 @@ class Calculator{
                     System.out.println("1/x");
                     System.out.print("Please enter x: ");
                     x = cal.nextDouble();
-
-                    //is x = 0?
-                    if(x == 0){
-                        System.out.println("Oops! Reciprocal of zero is not defined.");
-                        validOp = false;
-                    }
-                    else
-                        res = 1.0 / x;
+                    res = CalculatorLogic.reciprocal(x);
                     break;
 
                 case "sq":
                     System.out.println("x^2");
                     System.out.print("Please enter x: ");
                     x = cal.nextDouble();
-                    res = x * x;
+                    res = CalculatorLogic.square(x);
                     break;
 
                 case "e":
@@ -195,21 +165,14 @@ class Calculator{
                     System.out.println("Please enter x and y: ");
                     x = cal.nextDouble();
                     y = cal.nextDouble();
-                    res = Math.pow(x, y);
+                    res = CalculatorLogic.power(x, y);
                     break;
 
                 case "sr":
                     System.out.println("2-root(x)");
                     System.out.print("Please enter x: ");
                     x = cal.nextDouble();
-
-                    //is x = -ve?
-                    if(x < 0){
-                        System.out.println("Oops! Square root of negative is not allowed.");
-                        validOp = false;
-                    }
-                    else
-                        res = Math.sqrt(x);
+                    res = CalculatorLogic.squareRoot(x);
                     break;
 
                 case "r":
@@ -217,41 +180,21 @@ class Calculator{
                     System.out.println("Please enter x and y: ");
                     x = cal.nextDouble();
                     y = cal.nextDouble();
-
-                    if(x < 0 || y == 0){
-                        System.out.println("Oops! Zero root degree is not allowed.");
-                        validOp = false;
-                    }
-                    else
-                        res = Math.pow(x, 1.0 / y);
+                    res = CalculatorLogic.nthRoot(x, y);
                     break;
 
                 case "l":
                     System.out.println("log x (base 10)");
                     System.out.print("Please enter x: ");
                     x = cal.nextDouble();
-
-                    //is x <= 0?
-                    if(x <= 0){
-                        System.out.println("Oops! Logarithm undefined for x <= 0.");
-                        validOp = false;
-                    }
-                    else
-                        res = Math.log10(x);
+                    res = CalculatorLogic.log(x);
                     break;
 
                 case "ln":
                     System.out.println("ln x (base e)");
                     System.out.print("Please enter x: ");
                     x = cal.nextDouble();
-
-                    //is x <= 0?
-                    if(x <= 0){
-                        System.out.println("Oops! Natural logarithm undefined for x <= 0.");
-                        validOp = false;
-                    }
-                    else
-                        res = Math.log(x);
+                    res = CalculatorLogic.ln(x);
                     break;
 
                 case "lxy":
@@ -259,34 +202,28 @@ class Calculator{
                     System.out.println("Please enter x and y: ");
                     x = cal.nextDouble();
                     y = cal.nextDouble();
-
-                    if(x <= 0 || y <= 0 || y == 1){
-                        System.out.println("Oops! Invalid values for logarithm.");
-                        validOp = false;
-                    }
-                    else
-                        res = Math.log(x) / Math.log(y);
+                    res = CalculatorLogic.logBase(x, y);
                     break;
 
                 case "ex":
                     System.out.println("e^x");
                     System.out.print("Please enter x: ");
                     x = cal.nextDouble();
-                    res = Math.exp(x);
+                    res = CalculatorLogic.exp(x);
                     break;
 
                 case "2x":
                     System.out.println("2^x");
                     System.out.print("Please enter x: ");
                     x = cal.nextDouble();
-                    res = Math.pow(2, x);
+                    res = CalculatorLogic.power2(x);
                     break;
 
                 case "10x":
                     System.out.println("10^x");
                     System.out.print("Please enter x: ");
                     x = cal.nextDouble();
-                    res = Math.pow(10, x);
+                    res = CalculatorLogic.power10(x);
                     break;
 
                 default:
@@ -335,28 +272,24 @@ class Calculator{
             }
 
             System.out.print("Enter value: ");
-            double t = cal.nextDouble(), res = 0;
+            double t = cal.nextDouble(), res;
 
             switch(ch){
 
                 case 1:
-                    res = (t * 9 / 5) + 32;
+                    res = CalculatorLogic.celsiusToFahrenheit(t);
                     break;
 
                 case 2:
-                    res = (t - 32) * 5 / 9;
+                    res = CalculatorLogic.fahrenheitToCelsius(t);
                     break;
 
                 case 3: 
-                    res = t + 273.15;
+                    res = CalculatorLogic.celsiusToKelvin(t);
                     break;
 
                 case 4:
-                    if(t < 0){
-                        System.out.println("Negative K is not possible!");
-                        continue;
-                    }
-                    res = t - 273.15;
+                    res = CalculatorLogic.kelvinToCelsius(t);
                     break;
 
                 default:
@@ -402,24 +335,24 @@ class Calculator{
             }
 
             System.out.println("Enter amount: ");
-            double c = cal.nextDouble(), res = 0;
+            double c = cal.nextDouble(), res;
 
             switch(ch){
 
                 case 1:
-                    res = c / 95.41;
+                    res = CalculatorLogic.inrToUsd(c);
                     break;
 
                 case 2:
-                    res = c * 95.41;
+                    res = CalculatorLogic.usdToInr(c);
                     break;
 
                 case 3:
-                    res = c / 109.39;
+                    res = CalculatorLogic.inrToEur(c);
                     break;
 
                 case 4:
-                    res = c * 109.39;
+                    res = CalculatorLogic.eurToInr(c);
                     break;
 
                 default:
