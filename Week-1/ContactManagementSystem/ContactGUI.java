@@ -501,7 +501,7 @@ class SearchContactFrame extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        setLayout(new GridLayout(4, 1, 10, 10));
+        setLayout(new GridLayout(3, 1, 10, 10));
 
         phoneLabel = new JLabel("Enter Phone:", SwingConstants.CENTER);
 
@@ -517,7 +517,7 @@ class SearchContactFrame extends JFrame {
         btnSearch.setFont(new Font("Arial", Font.CENTER_BASELINE, 30));
 
         resultLabel = new JLabel("", SwingConstants.CENTER);
-        resultLabel.setFont(new Font("Arial", Font.CENTER_BASELINE, 20));
+        resultLabel.setFont(new Font("Arial", Font.ITALIC, 15));
 
         btnSearch.addActionListener(e -> {
 
