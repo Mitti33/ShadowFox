@@ -4,10 +4,6 @@ This repository contains the projects of my Java Development Internship at Shado
 
 ---
 
-# Week-1
-
----
-
 ## 📌 Technologies Used
 
 - Java
@@ -20,6 +16,12 @@ This repository contains the projects of my Java Development Internship at Shado
 ---
 
 # 📂 Projects
+
+---
+
+# Week-1
+
+---
 
 ## 1️. Calculator Application
 
@@ -183,6 +185,110 @@ Removes contacts from the system.
 
 ---
 
+# Week-2
+
+---
+
+## 1. Inventory Management System
+
+A desktop GUI application built with Java Swing that lets users manage product inventory through a clean, structured interface. Designed around core software engineering patterns including the Singleton, data binding via a custom table model, and O(n) search with conditional formatting for low-stock alerts.
+
+<p align="center">
+  <img width="850" height="516" alt="Screenshot 2026-06-14 020650" src="https://github.com/user-attachments/assets/75ab0543-1762-4af5-8bd4-f5350b1cd950" />
+  <br> <br> <br>
+  <img width="850" height="250" alt="Screenshot 2026-06-14 020736" src="https://github.com/user-attachments/assets/f80165f6-a438-4979-a056-9c55a047d296" />
+</p>
+
+---
+
+### Features
+
+**Core CRUD Operations**
+
+- Add new products with a name, category, unit price, and quantity
+- Update any existing product's fields directly from the form panel
+- Delete products with a confirmation dialog to prevent accidental removal
+- All form fields reset automatically after a successful add or update
+
+**Data Validation**
+
+- Negative stock is blocked at two levels: the `Product` setter throws `IllegalArgumentException` for any quantity below zero, and the form validates input before it ever reaches the model
+- Price and quantity fields are type-checked before submission; non-numeric input produces a clear error message
+- All fields are required - partial submissions are rejected
+
+**Live Search and Filter**
+
+- The search bar filters the table on every keystroke with no button press required, using an O(n) linear scan across product name and ID
+- A "Low Stock Only" checkbox filters the view to show only products below the threshold quantity, and can be combined with the text search simultaneously
+
+**Barcode Lookup**
+
+- A dedicated Barcode ID field accepts a numeric product ID and instantly scrolls to and selects the matching row in the table
+- As the user types, the lookup runs on each keystroke using the same O(n) search algorithm, giving real-time feedback in the status bar
+
+**Low Stock Alerts**
+
+- Any product with a quantity below 5 is highlighted in red across the entire row, implemented via a custom `DefaultTableCellRenderer` subclass
+- The highlighting updates automatically whenever data changes, with no manual refresh required
+- The header stat strip also tracks and displays the current count of low-stock items
+
+**Live Inventory Stats**
+
+- The header bar displays total product count, total inventory value (price x quantity summed across all products), and low-stock item count
+- All three values recalculate and repaint after every add, update, or delete operation
+
+**Instant Total Value Calculation**
+
+- The "Total Value" column in the table (unit price x quantity) is computed on the fly inside the table model and updates the moment a product is edited
+
+---
+
+### Architecture
+
+The project follows this structure:
+
+```
+src/
+├── Main.java                        Entry point — launches on the Event Dispatch Thread
+├── Product.java                     A single inventory item
+│── InventoryManager.java            Singleton: owns the master product list and all CRUD logic
+├── InventoryTableModel.java         Extends AbstractTableModel - binds Product objects to table rows
+├── LowStockRenderer.java            Extends DefaultTableCellRenderer - applies red row formatting
+└── MainFrame.java                   Main JFrame: assembles all panels, wires all event listeners
+```
+
+**Singleton Pattern** — `InventoryManager` enforces a single shared instance via a private constructor and a static `getInstance()` method. This guarantees all parts of the UI operate on the same product list.
+
+**Data Binding** — `InventoryTableModel` extends `AbstractTableModel` and overrides `getValueAt(row, col)` to map each `Product` field to a table column. Calling `fireTableDataChanged()` after any mutation signals Swing to repaint all cells without manual coordination.
+
+**Conditional Formatting** — `LowStockRenderer` overrides `getTableCellRendererComponent()` and is applied to every column. On each cell render, it reads the row's `Product` quantity and sets the background and foreground colours accordingly.
+
+---
+
+### Usage
+
+| Action | How |
+|---|---|
+| Add a product | Fill in Name, Category, Price, Quantity and click ADD |
+| Edit a product | Click any table row to auto-fill the form, modify fields, click UPDATE |
+| Delete a product | Select a row, click DELETE, confirm the dialog |
+| Search by name | Type in the Search bar — results filter live |
+| Search by ID / barcode | Type a numeric ID in the Barcode ID field — the matching row is selected |
+| View low stock only | Tick the "!! Low Stock Only" checkbox |
+| Clear the form | Click CLEAR or click an empty area of the table |
+
+---
+
+### Design Decisions
+
+**Why Swing over JavaFX?** Swing ships with every standard JDK installation and requires no additional setup or module configuration, making it immediately runnable in any standard Java environment.
+
+**Why no database?** The scope of this project is demonstrating GUI patterns and object-oriented design. The in-memory `ArrayList` inside `InventoryManager` can be replaced with JDBC or any ORM without changing a single line of the view or controller layers, because the Singleton acts as a clean abstraction boundary.
+
+**Search algorithm choice:** O(n) linear scan is the correct choice at this data scale. A `HashMap<Integer, Product>` would give O(1) ID lookups, but would require maintaining a second data structure in sync with the list. At typical inventory sizes (hundreds to low thousands of rows), the linear scan completes in under a millisecond and the added complexity of a dual structure is not justified.
+
+---
+
 ## Learning Outcomes
 
 Through these projects, I gained hands-on experience with:
@@ -205,4 +311,4 @@ Through these projects, I gained hands-on experience with:
 B.Tech in Computer Science & Engineering  
 Narula Institute of Technology
 
-Java Development Internship - Week 1
+Java Development Internship
