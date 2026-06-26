@@ -1,11 +1,11 @@
 package com.chatapp.server;
 
-import com.chatapp.common.Message;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+
+import com.chatapp.common.Message;
 
 public class ClientHandler implements Runnable {
 
@@ -75,7 +75,10 @@ public class ClientHandler implements Runnable {
 
         if (recipientHandler != null) {
             recipientHandler.sendMessage(message);
-            sendMessage(message);
+            // only send echo back to sender if they're messaging someone else
+            if (!recipient.equals(this.username)) {
+                sendMessage(message);
+            }
         } else {
             sendMessage(new Message("SERVER", "Server", username,
                     "User '" + recipient + "' not found."));
