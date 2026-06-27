@@ -10,6 +10,8 @@ public class Message implements Serializable {
     private String content;
     private String room;
     private String type;
+    private String fileName;
+    private byte[] fileData;
 
     public Message(String type, String sender, String room, String content) {
         this.type = type;
@@ -18,10 +20,20 @@ public class Message implements Serializable {
         this.content = content;
     }
 
+    public Message(String type, String sender, String room, String fileName, byte[] fileData){
+        this.type = type;
+        this.sender = sender;
+        this.room = room;
+        this.fileName = fileName;
+        this.fileData = fileData;
+    }
+
     public String getType()    { return type; }
     public String getSender()  { return sender; }
     public String getRoom()    { return room; }
     public String getContent() { return content; }
+    public String getFileName() { return fileName; }
+    public byte[] getFileData() { return fileData; }
 
     @Override
     public String toString() {

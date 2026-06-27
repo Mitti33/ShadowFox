@@ -66,6 +66,10 @@ public class ClientHandler implements Runnable {
 
             broadcastToRoom(new Message("JOIN", "Server", this.currentRoom,
                     username + " has joined " + this.currentRoom + "!"));
+        } else if (message.getType().equals("FILE")) {
+            broadcastToRoom(message);
+        } else if (message.getType().equals("PRIVATE_FILE")) {
+            sendPrivateFile(message);
         }
     }
 
@@ -101,6 +105,21 @@ public class ClientHandler implements Runnable {
             }
         } else {
             sendMessage(new Message("SERVER", "Server", username,
+                    "User '" + recipient + "' not found."));
+        }
+    }
+
+    private void sendPrivateFile(Message message) {
+        String recipient = message.getRoom();
+        ClientHandler recipientHandler = ChatServer.connectedUsers.get(recipient);
+
+        if (recipientHandler != null) {
+            recipientHandler.sendMessage(message);
+            if (!recipient.equals(this.username)) {
+                sendMessage(message);
+            }
+        } else {
+            sendMessage(new Message("SERVER", "Server", username, 
                     "User '" + recipient + "' not found."));
         }
     }

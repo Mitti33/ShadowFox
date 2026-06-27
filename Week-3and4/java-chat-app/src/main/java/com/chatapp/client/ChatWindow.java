@@ -1,9 +1,12 @@
 package com.chatapp.client;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.nio.file.Files;
 
 import com.chatapp.common.Message;
 
@@ -18,12 +21,14 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 public class ChatWindow {
 
     private static final String SERVER_ADDRESS = "localhost";
     private static final int SERVER_PORT = 12345;
+    private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
     private String username;
     private String currentRoom;
@@ -36,6 +41,7 @@ public class ChatWindow {
     private ListView<String> userList;
     private Label roomHeaderLabel;
     private TextField messageField;
+    private Stage stage;
 
     public ChatWindow(String username, String room) {
         this.username = username;
@@ -43,6 +49,8 @@ public class ChatWindow {
     }
 
     public void show(Stage stage) {
+
+        this.stage = stage;
 
         // room header bar 
         roomHeaderLabel = new Label("# " + currentRoom);
@@ -62,7 +70,10 @@ public class ChatWindow {
         Button sendButton = new Button("Send");
         sendButton.getStyleClass().add("primary-button");
 
-        HBox inputBar = new HBox(8, messageField, sendButton);
+        Button fileButton = new Button("📎");
+        fileButton.getStyleClass().add("file-button");
+
+        HBox inputBar = new HBox(8, messageField, fileButton, sendButton);
         inputBar.getStyleClass().add("input-bar");
         inputBar.setAlignment(Pos.CENTER);
 
@@ -112,9 +123,10 @@ public class ChatWindow {
         root.setCenter(chatArea);
         root.getStyleClass().add("root-pane");
 
-        // send button action 
+        // buttons and field action 
         sendButton.setOnAction(e -> handleSend());
         messageField.setOnAction(e -> handleSend());
+        fileButton.setOnAction(e -> handleFileSelect());
 
         // scene and stage 
         Scene scene = new Scene(root, 800, 550);
@@ -201,6 +213,38 @@ public class ChatWindow {
                 messageList.getItems().add(dmLine);
                 messageList.scrollTo(messageList.getItems().size() - 1);
 
+            } else if (type.equals("FILE")) {
+                String fileName = message.getFileName();
+                String displayLine = "📎 " + sender + " sent a file: " + fileName;
+                int index = messageList.getItems().size();
+                messageList.getItems().add(displayLine + "  [Click to Save]");
+                messageList.scrollTo(index);
+
+                messageList.setOnMouseClicked(event -> {
+                    int selected = messageList.getSelectionModel()
+                                            .getSelectedIndex();
+                    if (selected == index) {
+                        saveFileWithChooser(message, stage);
+                    }
+                });
+
+            } else if (type.equals("PRIVATE_FILE")) {
+                String fileName  = message.getFileName();
+                String recipient = message.getRoom();
+                String label     = sender.equals(username)
+                    ? "📎 [File to "   + recipient + "] " + fileName
+                    : "📎 [File from " + sender    + "] " + fileName;
+                int index = messageList.getItems().size();
+                messageList.getItems().add(label + "  [Click to Save]");
+                messageList.scrollTo(index);
+
+                messageList.setOnMouseClicked(event -> {
+                    int selected = messageList.getSelectionModel()
+                                            .getSelectedIndex();
+                    if (selected == index) {
+                        saveFileWithChooser(message, stage);
+                    }
+                });
             } else if (type.equals("SERVER")) {
                 messageList.getItems().add("⚠ " + content);
                 messageList.scrollTo(messageList.getItems().size() - 1);
@@ -210,6 +254,72 @@ public class ChatWindow {
                 messageList.scrollTo(messageList.getItems().size() - 1);
             }
         });
+    }
+
+    private void handleFileSelect() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select a file to send");
+        fileChooser.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter(
+                "Allowed Files", "*.png", "*.jpg", "*.jpeg",
+                                "*.gif", "*.txt", "*.pdf")
+        );
+
+        File selectedFile = fileChooser.showOpenDialog(stage);
+        if (selectedFile == null) return;
+
+        if (selectedFile.length() > MAX_FILE_SIZE) {
+            messageList.getItems().add(
+                "⚠ File too large. Maximum size is 5MB.");
+            return;
+        }
+
+        try {
+            byte[] fileData = Files.readAllBytes(selectedFile.toPath());
+            String fileName = selectedFile.getName();
+            String prefix = messageField.getText().trim();
+
+            if (prefix.startsWith("@")) {
+                String recipient = prefix.substring(1).trim();
+                if (recipient.isEmpty()) {
+                    messageList.getItems().add(
+                        "⚠ Usage: type @username then click 📎");
+                    return;
+                }
+                sendMessage(new Message(
+                    "PRIVATE_FILE", username, recipient,
+                    fileName, fileData));
+            } else {
+                sendMessage(new Message(
+                    "FILE", username, currentRoom,
+                    fileName, fileData));
+            }
+
+            messageField.clear();
+
+        } catch (IOException e) {
+            messageList.getItems().add("⚠ Could not read file.");
+        }
+    }
+
+    private void saveFileWithChooser(Message message, Stage stage) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save File");
+        fileChooser.setInitialFileName(message.getFileName());
+
+        File destination = fileChooser.showSaveDialog(stage);
+        if (destination == null) return;
+
+        try (FileOutputStream fos = new FileOutputStream(destination)) {
+            fos.write(message.getFileData());
+            messageList.getItems().add(
+                "✔ Saved: " + destination.getAbsolutePath());
+            messageList.scrollTo(
+                messageList.getItems().size() - 1);
+        } catch (IOException e) {
+            messageList.getItems().add(
+                "⚠ Could not save file: " + e.getMessage());
+        }
     }
 
     private void handleSend() {

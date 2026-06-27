@@ -204,3 +204,20 @@
 .user-list .list-cell:empty {
     -fx-background-color: transparent;
 }
+
+/* file button */
+.file-button {
+    -fx-background-color: #1a1a1a;
+    -fx-text-fill: #ff6b9d;
+    -fx-font-size: 16px;
+    -fx-padding: 6px 10px;
+    -fx-border-color: #ff6b9d;
+    -fx-border-width: 1px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-cursor: hand;
+}
+
+.file-button:hover {
+    -fx-background-color: #2a1a22;
+}
