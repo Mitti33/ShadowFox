@@ -173,26 +173,42 @@ public class ChatWindow {
 
     private void handleIncomingMessage(Message message) {
         Platform.runLater(() -> {
-            String type = message.getType();
-            String sender = message.getSender();
+            String type    = message.getType();
+            String sender  = message.getSender();
             String content = message.getContent();
-            String room = message.getRoom();
 
-            if (type.equals("JOIN") || type.equals("LEAVE")) {
+            if (type.equals("USER_LIST")) {
+                userList.getItems().clear();
+                if (!content.isEmpty()) {
+                    String[] users = content.split(",");
+                    for (String user : users) {
+                        userList.getItems().add("● " + user);
+                    }
+                }
+
+            } else if (type.equals("JOIN") || type.equals("LEAVE")) {
                 messageList.getItems().add("⚡ " + content);
+                messageList.scrollTo(messageList.getItems().size() - 1);
 
             } else if (type.equals("PRIVATE")) {
-                String dm = "🔒 [DM] " + sender + ": " + content;
-                messageList.getItems().add(dm);
+                String recipient = message.getRoom();
+                String dmLine;
+                if (sender.equals(username)) {
+                    dmLine = "🔒 [DM to " + recipient + "] " + content;
+                } else {
+                    dmLine = "🔒 [DM from " + sender + "] " + content;
+                }
+                messageList.getItems().add(dmLine);
+                messageList.scrollTo(messageList.getItems().size() - 1);
 
             } else if (type.equals("SERVER")) {
                 messageList.getItems().add("⚠ " + content);
+                messageList.scrollTo(messageList.getItems().size() - 1);
 
             } else {
                 messageList.getItems().add(sender + ": " + content);
+                messageList.scrollTo(messageList.getItems().size() - 1);
             }
-
-            messageList.scrollTo(messageList.getItems().size() - 1);
         });
     }
 

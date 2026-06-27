@@ -13,7 +13,7 @@ public class ClientHandler implements Runnable {
     private ObjectInputStream input;
     private ObjectOutputStream output;
     private String username;
-    private String currentRoom;
+    private volatile String currentRoom;
 
     public ClientHandler(Socket socket) {
         this.socket = socket;
@@ -32,8 +32,11 @@ public class ClientHandler implements Runnable {
             ChatServer.connectedUsers.put(username, this);
 
             System.out.println(username + " joined room: " + currentRoom);
+
             broadcastToRoom(new Message("JOIN", "Server", currentRoom,
                     username + " has joined " + currentRoom + "!"));
+
+            broadcastUserList();
 
             while (true) {
                 Message message = (Message) input.readObject();
@@ -55,9 +58,14 @@ public class ClientHandler implements Runnable {
             sendPrivateMessage(message);
 
         } else if (message.getType().equals("JOIN")) {
+            String oldRoom   = this.currentRoom;
             this.currentRoom = message.getRoom();
-            broadcastToRoom(new Message("JOIN", "Server", currentRoom,
-                    username + " has joined " + currentRoom + "!"));
+
+            broadcastToRoom(new Message("LEAVE", "Server", oldRoom,
+                    username + " has left " + oldRoom + "."));
+
+            broadcastToRoom(new Message("JOIN", "Server", this.currentRoom,
+                    username + " has joined " + this.currentRoom + "!"));
         }
     }
 
@@ -69,13 +77,25 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    private void broadcastUserList() {
+        String userListStr = String.join(",",
+                ChatServer.connectedUsers.keySet());
+
+        Message userListMsg = new Message(
+                "USER_LIST", "Server", "all", userListStr);
+
+        for (ClientHandler user : ChatServer.connectedUsers.values()) {
+            user.sendMessage(userListMsg);
+        }
+    }
+
     private void sendPrivateMessage(Message message) {
         String recipient = message.getRoom();
-        ClientHandler recipientHandler = ChatServer.connectedUsers.get(recipient);
+        ClientHandler recipientHandler =
+                ChatServer.connectedUsers.get(recipient);
 
         if (recipientHandler != null) {
             recipientHandler.sendMessage(message);
-            // only send echo back to sender if they're messaging someone else
             if (!recipient.equals(this.username)) {
                 sendMessage(message);
             }
@@ -90,15 +110,19 @@ public class ClientHandler implements Runnable {
             output.writeObject(message);
             output.flush();
         } catch (IOException e) {
-            System.out.println("Failed to send message to " + username);
+            System.out.println("Failed to send to " + username);
         }
     }
 
     private void cleanup() {
         try {
             ChatServer.connectedUsers.remove(username);
+
             broadcastToRoom(new Message("LEAVE", "Server", currentRoom,
                     username + " has left the room."));
+
+            broadcastUserList();
+
             if (socket != null) socket.close();
         } catch (IOException e) {
             System.out.println("Error closing socket for " + username);
