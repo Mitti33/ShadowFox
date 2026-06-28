@@ -4,6 +4,10 @@
 Supports multiple users, chat rooms, private messaging, and file transfer over raw TCP sockets.
 
 <p align = "center">
+  <video autoplay muted loop controls width="900" height="500">
+    <source src="https://github.com/user-attachments/assets/c5da4037-2e3c-4f96-ba3e-0eca5b061311" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
   <img width="400" height="450" alt="Screenshot 2026-06-27 204853" src="https://github.com/user-attachments/assets/2c5f7661-7dbd-496e-b273-471c38948e4d" />
   <img width="596" height="450" alt="Screenshot 2026-06-27 210103" src="https://github.com/user-attachments/assets/e8908d18-cc83-4e86-b974-250f32518589" />
   <br> <br> <br>
@@ -141,6 +145,13 @@ java-chat-app/
 ---
 
 ## How to Run
+
+<p align="center">
+ <video autoplay muted loop controls width="900" height="500">
+    <source src="https://github.com/user-attachments/assets/07bb7f36-9988-4251-8c91-ac952b46379d" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+</p>
 
 ### Prerequisites
 - Java 23 or higher
