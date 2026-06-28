@@ -25,7 +25,7 @@ This repository contains the projects of my Java Development Internship at Shado
 
 ## 1️. Calculator Application
 
-A menu-driven calculator application developed in Java.
+> A menu-driven calculator application developed in Java.
 
 ### Features
 
@@ -73,7 +73,7 @@ A menu-driven calculator application developed in Java.
 
 ## 2️. Contact Management System
 
-A desktop-based Contact Management System developed using Java Swing and OOP principles.
+> A desktop-based Contact Management System developed using Java Swing and OOP principles.
 
 ### Features
 
@@ -191,7 +191,7 @@ Removes contacts from the system.
 
 ## 1. Inventory Management System
 
-A desktop GUI application built with Java Swing that lets users manage product inventory through a clean, structured interface. Designed around core software engineering patterns including the Singleton, data binding via a custom table model, and O(n) search with conditional formatting for low-stock alerts.
+> A desktop GUI application built with Java Swing that lets users manage product inventory through a clean, structured interface. Designed around core software engineering patterns including the Singleton, data binding via a custom table model, and O(n) search with conditional formatting for low-stock alerts.
 
 <p align="center">
   <img width="850" height="516" alt="Screenshot 2026-06-14 020650" src="https://github.com/user-attachments/assets/75ab0543-1762-4af5-8bd4-f5350b1cd950" />
@@ -288,6 +288,156 @@ src/
 **Search algorithm choice:** O(n) linear scan is the correct choice at this data scale. A `HashMap<Integer, Product>` would give O(1) ID lookups, but would require maintaining a second data structure in sync with the list. At typical inventory sizes (hundreds to low thousands of rows), the linear scan completes in under a millisecond and the added complexity of a dual structure is not justified.
 
 ---
+
+## Library Management System
+
+> A console-based Library Management System built in Java, demonstrating real-world backend architecture with **JDBC**, **DAO pattern**, **SQLite persistence**, and **Google Books API integration**.
+
+<p align="center">
+  <img width="500" height="380" alt="Screenshot 2026-06-24 174838" src="https://github.com/user-attachments/assets/b029865b-f2e7-4bbf-a5f8-79b2610f23db" />
+  <br> <br> <br>
+  <img width="500" height="320" alt="Screenshot 2026-06-24 175104" src="https://github.com/user-attachments/assets/bf0167ab-9dcf-41e5-8f0e-a68610fc76cf" />
+  <br> <br> <br>
+  <img width="700" height="280" alt="Screenshot 2026-06-24 173942" src="https://github.com/user-attachments/assets/b62cb556-6eb9-4415-8d6b-2c66db683061" />
+</p>
+
+---
+
+### Features
+ 
+| Feature | Description |
+|---|---|
+| Book Management | Add books manually or auto-fetch via ISBN |
+| User Management | Register and list library members |
+| Borrow / Return | Issue and return books with date tracking |
+| Fine Calculation | Automatically calculates overdue fines |
+| Google Books API | Fetch book metadata by ISBN in real time |
+| SQLite Database | Persistent local storage via JDBC |
+ 
+---
+ 
+### Project Structure
+ 
+```
+LibraryManagementSystem/
+├── src/
+│   ├── dao/                          Data Access Objects (DB layer)
+│   │   ├── BookDAO.java
+│   │   ├── UserDAO.java
+│   │   └── BorrowRecordDAO.java
+│   ├── model/                        Entity / POJO classes
+│   │   ├── Book.java
+│   │   ├── User.java
+│   │   └── BorrowRecord.java
+│   ├── service/                      Business logic layer
+│   │   └── LibraryService.java
+│   ├── util/                         Utilities
+│   │   └── DatabaseConnection.java
+│   ├── Main.java                     Entry point
+│   └── library.db                    SQLite database file
+├── lib/
+│   ├── sqlite-jdbc-3.53.2.0.jar
+│   └── json-20260522.jar
+├── bin/
+├── target/
+└── pom.xml
+```
+ 
+---
+ 
+### Architecture
+ 
+This project follows a **layered architecture** pattern:
+ 
+```
+Main.java
+    └── LibraryService        (Business Logic)
+            ├── BookDAO       (DB operations for books)
+            ├── UserDAO       (DB operations for users)
+            └── BorrowRecordDAO  (DB operations for borrow records)
+                    └── DatabaseConnection  (JDBC SQLite connection)
+```
+ 
+- **Model layer** — Plain Java objects representing `Book`, `User`, and `BorrowRecord`
+- **DAO layer** — Each DAO handles all CRUD SQL for its entity, keeping DB logic isolated
+- **Service layer** — `LibraryService` coordinates DAOs and enforces business rules (e.g. availability checks, fine calculation)
+- **Main** — Drives the console menu loop and delegates to the service
+---
+ 
+### Prerequisites
+ 
+- Java 8 or higher
+- No Maven installation required (JARs are bundled in `/lib`)
+### Running the Project
+ 
+**Option 1 — Using VS Code / any IDE:**
+Open the project and run `Main.java` directly.
+ 
+**Option 2 — Command line:**
+ 
+```bash
+# Compile
+javac -cp "lib/sqlite-jdbc-3.53.2.0.jar;lib/json-20260522.jar" -d bin src/**/*.java src/Main.java
+ 
+# Run (Windows)
+java -cp "bin;lib/sqlite-jdbc-3.53.2.0.jar;lib/json-20260522.jar" Main
+ 
+# Run (Linux / macOS — use : instead of ;)
+java -cp "bin:lib/sqlite-jdbc-3.53.2.0.jar:lib/json-20260522.jar" Main
+```
+ 
+> The SQLite database (`library.db`) is created automatically on first run inside `/src`.
+ 
+---
+ 
+### Menu Options
+ 
+```
+=== Library Menu ===
+1.  Add Book
+2.  Add User
+3.  Borrow Book
+4.  Return Book
+5.  List All Books
+6.  List All Users
+7.  List Borrow Records
+8.  Calculate Fine
+9.  Add Book by ISBN (Google Books API)
+10. Exit
+```
+ 
+---
+ 
+### Google Books API Integration
+ 
+Option **9** allows you to add a book by entering its ISBN. The system fetches the title, author, and other metadata directly from the [Google Books API](https://developers.google.com/books) and saves it to the local database — no manual entry needed.
+ 
+> **Note:** The API is rate-limited. If you see a `429` error, wait a moment and try again.
+ 
+---
+ 
+### Tech Stack
+ 
+| Technology | Purpose |
+|---|---|
+| Java | Core application language |
+| SQLite | Local relational database |
+| JDBC | Java–database connectivity |
+| DAO Pattern | Separation of DB logic from business logic |
+| Google Books API | Remote book metadata lookup |
+| org.json | JSON parsing for API responses |
+ 
+---
+ 
+### Dependencies
+ 
+| JAR | Version | Purpose |
+|---|---|---|
+| `sqlite-jdbc` | 3.53.2.0 | SQLite JDBC driver |
+| `json` | 20260522 | JSON parsing (API responses) |
+ 
+---
+<br>
 
 ## Learning Outcomes
 
